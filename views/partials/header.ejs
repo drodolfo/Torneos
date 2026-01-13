@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Torneo de Fútbol</title>
+   <link rel="stylesheet" href="/output.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+</head>
+<body>
+  <header>
+    <div class="theme-selector">
+      <button id="theme-light" title="Modo Claro" aria-label="Cambiar a tema claro">
+        <i class="fas fa-sun" aria-hidden="true"></i>
+      </button>
+      <button id="theme-dark" title="Modo Oscuro" aria-label="Cambiar a tema oscuro">
+        <i class="fas fa-moon" aria-hidden="true"></i>
+      </button>
+      <button id="theme-auto" title="Automático" class="active" aria-label="Cambiar a tema automático">
+        <i class="fas fa-adjust" aria-hidden="true"></i>
+      </button>
+    </div>
+    <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle navigation menu">
+      <i class="fas fa-bars"></i>
+    </button>
+    <nav id="main-nav">
+      <a href="/">Inicio</a>
+      <a href="/fixtures">Partidos</a>
+      <a href="/results">Resultados</a>
+      <a href="/table">Tabla</a>
+      <a href="/tournament-teams">Equipos</a>
+      <a href="/rules">Reglas</a>
+      <a href="/admin/login" class="admin-link">Admin</a>
+    </nav>
+  </header>
+  <main>

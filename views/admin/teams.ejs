@@ -1,0 +1,48 @@
+<%- include('../partials/header') %>
+<h2>Gestionar Equipos</h2>
+<nav class="admin-subnav">
+  <a href="/admin/dashboard" class="subnav-link">← Volver al Panel</a>
+  <a href="/admin/matches?tournament=<%= selectedTournament %>" class="subnav-link">Gestionar Partidos</a>
+</nav>
+
+<% if (typeof error !== 'undefined') { %>
+  <div class="error-message"><%= error %></div>
+<% } %>
+
+<% if (tournaments.length > 0) { %>
+  <form method="get" action="/admin/teams" class="tournament-selector">
+    <label>Seleccionar Torneo:
+      <select name="tournament" onchange="this.form.submit()">
+        <% tournaments.forEach(t => { %>
+          <option value="<%= t.id %>" <%= t.id == selectedTournament ? 'selected' : '' %>><%= t.name %></option>
+        <% }) %>
+      </select>
+    </label>
+  </form>
+<% } %>
+
+<form method="post" action="/admin/teams">
+  <input type="hidden" name="tournament_id" value="<%= selectedTournament %>" />
+  <input name="name" placeholder="Nombre del equipo" required />
+  <input name="user_name" placeholder="Usuario responsable" />
+  <input type="number" name="edad" placeholder="Edad promedio" />
+  <input name="locacion" placeholder="Locación" />
+  <input name="contacto" placeholder="Contacto (teléfono/email)" />
+  <button type="submit">Agregar equipo</button>
+</form>
+
+<ul>
+  <% teams.forEach(t => { %>
+    <li>
+      <strong><%= t.name %></strong>  
+      — Responsable: <%= t.user_name || 'N/A' %>  
+      — Edad: <%= t.edad || 'N/A' %>  
+      — Locación: <%= t.locacion || 'N/A' %>  
+      — Contacto: <%= t.contacto || 'N/A' %>
+      <form method="post" action="/admin/teams/<%= t.id %>/delete" style="display:inline;">
+        <button type="submit">Eliminar</button>
+      </form>
+    </li>
+  <% }) %>
+</ul>
+<%- include('../partials/footer') %>

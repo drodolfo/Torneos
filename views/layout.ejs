@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Torneo de Fútbol</title>
+  <link rel="stylesheet" href="/output.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="/">Inicio</a>
+      <a href="/fixtures">Partidos</a>
+      <a href="/results">Resultados</a>
+      <a href="/table">Tabla</a>
+      <a href="/admin/login" style="float:right">Admin</a>
+    </nav>
+  </header>
+  <main>
+    <%- body %>
+  </main>
+  <footer>© <%= new Date().getFullYear() %> Torneo de Fútbol</footer>
+</body>
+</html>

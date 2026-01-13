@@ -1,0 +1,1024 @@
+@import "tailwindcss";
+
+/* CSS Variables for themes */
+:root {
+  /* Light theme variables */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-tertiary: #e9ecef;
+  --bg-card: #ffffff;
+  --bg-header: #ffffff;
+  --bg-nav: #f8f9fa;
+  --bg-footer: #f8f9fa;
+
+  --text-primary: #212529;
+  --text-secondary: #6c757d;
+  --text-muted: #adb5bd;
+
+  --border-color: #dee2e6;
+  --border-light: #e9ecef;
+
+  --shadow-color: rgba(0,0,0,0.1);
+  --shadow-hover: rgba(0,0,0,0.2);
+}
+
+/* Dark theme variables */
+[data-theme="dark"] {
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-tertiary: #334155;
+  --bg-card: #1e293b;
+  --bg-header: #1e293b;
+  --bg-nav: #1e293b;
+  --bg-footer: #1e293b;
+
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+
+  --border-color: #334155;
+  --border-light: #475569;
+
+  --shadow-color: rgba(0,0,0,0.3);
+  --shadow-hover: rgba(0,0,0,0.4);
+}
+
+/* Light theme variables (explicit) */
+[data-theme="light"] {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-tertiary: #e9ecef;
+  --bg-card: #ffffff;
+  --bg-header: #ffffff;
+  --bg-nav: #f8f9fa;
+  --bg-footer: #f8f9fa;
+
+  --text-primary: #212529;
+  --text-secondary: #6c757d;
+  --text-muted: #adb5bd;
+
+  --border-color: #dee2e6;
+  --border-light: #e9ecef;
+
+  --shadow-color: rgba(0,0,0,0.1);
+  --shadow-hover: rgba(0,0,0,0.2);
+}
+
+/* Reset & base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* Theme selector */
+.theme-selector {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  z-index: 1000;
+  background: var(--bg-card);
+  padding: 0.5rem;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+.theme-selector button {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 0.4rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.theme-selector button:hover {
+  background: var(--bg-tertiary);
+  transform: scale(1.05);
+}
+
+.theme-selector button.active {
+  background: #8b5cf6;
+  color: white;
+  border-color: #8b5cf6;
+}
+
+/* Header & nav */
+header {
+  background: var(--bg-header);
+  padding: 1.5rem 2rem;
+  box-shadow: 0 4px 20px var(--shadow-color);
+  border-bottom: 1px solid var(--border-color);
+  position: relative;
+  padding-right: 6rem; /* Make space for theme selector */
+  z-index: 999; /* Lower than mobile menu button */
+}
+
+header nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+header nav a {
+  color: var(--text-primary);
+  text-decoration: none;
+  margin: 0 1rem;
+  font-weight: 600;
+  font-size: 1.1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 25px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+header nav a:hover {
+  background: var(--bg-tertiary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--shadow-hover);
+}
+
+/* Admin link special styling */
+header nav .admin-link {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+  border: 2px solid #8b5cf6 !important;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3) !important;
+}
+
+header nav .admin-link:hover {
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%) !important;
+  transform: translateY(-2px) scale(1.02) !important;
+  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.4) !important;
+}
+
+/* Main content */
+main {
+  max-width: 1100px;
+  margin: 3rem auto;
+  padding: 2rem;
+  background: var(--bg-card);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px var(--shadow-color);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-color);
+}
+
+/* Headings */
+h1, h2, h3 {
+  margin-bottom: 1.5rem;
+  color: var(--text-primary);
+  font-weight: 700;
+  text-align: center;
+  position: relative;
+}
+
+h1::after, h2::after, h3::after {
+  content: '';
+  display: block;
+  width: 60px;
+  height: 4px;
+  background: linear-gradient(45deg, #8b5cf6, #a855f7);
+  margin: 0.5rem auto;
+  border-radius: 2px;
+}
+
+/* Lists */
+ul {
+  list-style: none;
+  margin-top: 1.5rem;
+}
+
+ul li {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-card);
+  margin-bottom: 0.5rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px var(--shadow-color);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+ul li:hover {
+  background: var(--bg-tertiary);
+  transform: translateX(5px);
+  box-shadow: 0 4px 12px var(--shadow-hover);
+}
+
+/* Forms */
+form {
+  margin: 1.5rem 0;
+  background: var(--bg-secondary);
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+}
+
+form input, form select {
+  padding: 0.75rem;
+  margin: 0.5rem 0;
+  border: 2px solid var(--border-light);
+  border-radius: 8px;
+  width: 100%;
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+form input:focus, form select:focus {
+  outline: none;
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+form button {
+  background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+  color: #fff;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 1rem;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+}
+
+form button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.3);
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1.5rem;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px var(--shadow-color);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+}
+
+th, td {
+  padding: 1rem;
+  text-align: center;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+th {
+  background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+  color: #fff;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 0.9rem;
+}
+
+tr:nth-child(even) {
+  background: var(--bg-tertiary);
+}
+
+tr:hover {
+  background: var(--bg-secondary);
+  transition: background 0.2s ease;
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  padding: 2rem;
+  margin-top: 3rem;
+  background: var(--bg-footer);
+  color: var(--text-primary);
+  border-top: 4px solid #8b5cf6;
+  box-shadow: 0 -4px 20px var(--shadow-color);
+}
+
+.team-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  box-shadow: 0 4px 12px var(--shadow-color);
+  transition: all 0.3s ease;
+}
+
+.team-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px var(--shadow-hover);
+  border-color: #8b5cf6;
+}
+
+.team-card p {
+  margin: 0.75rem 0;
+  color: var(--text-secondary);
+}
+
+table td a {
+  color: #8b5cf6;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+table td a:hover {
+  color: #a855f7;
+  text-decoration: underline;
+  transform: scale(1.05);
+}
+
+/* Admin styles */
+.stats {
+  display: flex;
+  justify-content: space-around;
+  margin: 2rem 0;
+  background: var(--bg-secondary);
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+}
+
+.stats p {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.admin-nav {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.admin-nav .admin-link {
+  display: block;
+  background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+  color: #fff;
+  text-decoration: none;
+  padding: 1rem;
+  border-radius: 12px;
+  text-align: center;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+}
+
+.admin-nav .admin-link:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.3);
+  background: linear-gradient(135deg, #7c3aed 0%, #9333ea 100%);
+}
+
+.logout-form {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.logout-btn {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: #fff;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+}
+
+.logout-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.3);
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+}
+
+.admin-subnav {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.subnav-link {
+  color: #8b5cf6;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  background: var(--bg-tertiary);
+  transition: all 0.2s ease;
+}
+
+.subnav-link:hover {
+  background: #8b5cf6;
+  color: #fff;
+}
+
+.home-nav {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.home-link {
+  background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+  color: #fff;
+  text-decoration: none;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+}
+
+.home-link:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.3);
+}
+
+.result-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 400px;
+  margin: 2rem auto;
+}
+
+.result-form label {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.result-form input {
+  padding: 0.75rem;
+  border: 2px solid var(--border-light);
+  border-radius: 8px;
+  font-size: 1rem;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.result-form input:focus {
+  outline: none;
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+.result-form button {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #fff;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+  margin-top: 1rem;
+}
+
+.result-form button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+}
+
+.tournament-selector {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.tournament-selector label {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.tournament-selector select {
+  padding: 0.5rem;
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+  margin-left: 0.5rem;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.error-message {
+  background: #dc2626;
+  color: #fecaca;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #b91c1c;
+  margin: 1rem 0;
+  font-weight: 600;
+}
+
+.tournament-filter {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.tournament-filter label {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.tournament-filter select {
+  padding: 0.5rem;
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+  margin-left: 0.5rem;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.tournament-filter button {
+  background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-left: 0.5rem;
+  transition: background 0.2s ease;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.2);
+}
+
+.tournament-filter button:hover {
+  background: linear-gradient(135deg, #7c3aed 0%, #9333ea 100%);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+/* Tournament cards and sections */
+.tournament-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  box-shadow: 0 4px 12px var(--shadow-color);
+  transition: all 0.3s ease;
+}
+
+.tournament-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px var(--shadow-hover);
+  border-color: #8b5cf6;
+}
+
+.tournament-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.tournament-links a {
+  background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+  color: #fff;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.2);
+}
+
+.tournament-links a:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.tournament-links a:nth-child(2) {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2);
+}
+
+.tournament-links a:nth-child(2):hover {
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.tournament-links a:nth-child(3) {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+}
+
+.tournament-links a:nth-child(3):hover {
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.tournament-links a:nth-child(4) {
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.2);
+}
+
+.tournament-links a:nth-child(4):hover {
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+}
+
+.tournament-links a:nth-child(5) {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+}
+
+.tournament-links a:nth-child(5):hover {
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.tournaments-section {
+  margin: 2rem 0;
+}
+
+.rules-content h4 {
+  color: #8b5cf6;
+  margin-bottom: 0.5rem;
+}
+
+.rules-text {
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* Teams grid and cards */
+.teams-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.team-card h3 {
+  color: #8b5cf6;
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+}
+
+.team-info p {
+  margin: 0.5rem 0;
+  color: var(--text-secondary);
+}
+
+.team-info p strong {
+  color: var(--text-primary);
+}
+
+/* Mobile Navigation */
+.mobile-menu-toggle {
+  display: none !important; /* Hidden by default, shown only on mobile */
+  background: #7c44ff !important; /* Bright red for visibility */
+  border: 2px solid #cc0000 !important;
+  color: #ffffff !important;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001 !important; /* Higher than theme selector */
+}
+
+.mobile-menu-toggle:hover {
+  background: var(--bg-tertiary);
+  transform: scale(1.05);
+}
+
+.mobile-menu-toggle:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--border-color);
+}
+
+/* Force mobile menu button visibility */
+@media (max-width: 768px) {
+  button.mobile-menu-toggle#mobile-menu-toggle {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    left: 1rem !important;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  /* Header and Navigation */
+  header {
+    padding: 1rem;
+    padding-left: 5rem; /* Space for mobile menu button */
+    padding-right: 5rem; /* Space for theme selector */
+    padding-top: 4rem; /* Space for mobile menu button */
+  }
+
+  header nav {
+    display: none;
+    flex-direction: column;
+    gap: 1rem;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--bg-header);
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: 0 4px 12px var(--shadow-color);
+  }
+
+  header nav.show {
+    display: flex;
+  }
+
+  header nav a {
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    text-align: center;
+    margin: 0;
+  }
+
+  /* Admin link special styling in mobile */
+  .admin-link {
+    margin-top: 0.5rem;
+    border-radius: 8px;
+    border: 2px solid #8b5cf6;
+    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+  }
+
+  .mobile-menu-toggle {
+    display: block !important;
+    position: fixed !important;
+    left: 1rem !important;
+    top: 1rem !important;
+  background: #8b5cf6 !important;
+  border: 2px solid #7c3aed !important;
+    color: #ffffff !important;
+    z-index: 10000 !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3) !important;
+  }
+
+  /* Theme selector for mobile */
+  .theme-selector {
+    top: 1rem;
+    right: 1rem;
+    flex-direction: row;
+    padding: 0.25rem;
+  }
+
+  .theme-selector button {
+    width: 32px;
+    height: 32px;
+    font-size: 0.9rem;
+  }
+
+  /* Main content */
+  main {
+    margin: 0.5rem;
+    padding: 1rem;
+    border-radius: 8px;
+  }
+
+  /* Tables - Horizontal scroll */
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 1rem 0;
+    border-radius: 8px;
+  }
+
+  table {
+    font-size: 0.75rem;
+    min-width: 600px; /* Ensure minimum width for proper display */
+    white-space: nowrap;
+  }
+
+  th, td {
+    padding: 0.5rem 0.75rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
+  }
+
+  th {
+    font-size: 0.7rem;
+    font-weight: 700;
+  }
+
+  /* Lists */
+  ul li {
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  /* Forms */
+  form {
+    padding: 1rem;
+  }
+
+  .result-form {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .result-form input {
+    width: 100%;
+  }
+
+  /* Tournament cards */
+  .tournament-card {
+    padding: 1rem;
+    margin: 0.5rem 0;
+  }
+
+  .tournament-links {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .tournament-links a {
+    padding: 0.75rem 1rem;
+    text-align: center;
+    font-size: 0.85rem;
+  }
+
+  /* Teams grid */
+  .teams-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  /* Stats */
+  .stats {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .stats p {
+    font-size: 1.1rem;
+  }
+
+  /* Admin navigation */
+  .admin-nav {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .admin-nav a {
+    padding: 1rem;
+    font-size: 0.9rem;
+  }
+
+  /* Subnav */
+  .admin-subnav {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .admin-subnav a {
+    padding: 0.75rem 1rem;
+    text-align: center;
+  }
+
+  /* Home navigation */
+  .home-nav {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .home-link {
+    padding: 1rem 2rem;
+    font-size: 1rem;
+  }
+
+  /* Footer */
+  footer {
+    padding: 1.5rem 1rem;
+    text-align: center;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+  header {
+    padding: 0.75rem;
+    padding-left: 4.5rem; /* Space for mobile menu button */
+    padding-right: 4.5rem; /* Space for theme selector */
+  }
+
+  .mobile-menu-toggle {
+    display: block !important;
+    position: fixed !important;
+    left: 1rem !important;
+    top: 1rem !important;
+    width: 36px !important;
+    height: 36px !important;
+    font-size: 1.1rem !important;
+  background: #8b5cf6 !important;
+  border: 2px solid #7c3aed !important;
+    color: #ffffff !important;
+    z-index: 10000 !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3) !important;
+  }
+
+  .theme-selector {
+    top: 0.75rem;
+    right: 0.75rem;
+  }
+
+  .theme-selector button {
+    width: 30px;
+    height: 30px;
+    font-size: 0.8rem;
+  }
+
+  main {
+    margin: 0.25rem;
+    padding: 0.75rem;
+  }
+
+  .table-container {
+    margin: 0.5rem -0.5rem;
+  }
+
+  table {
+    font-size: 0.7rem;
+    min-width: 700px; /* Even wider for very small screens */
+  }
+
+  th, td {
+    padding: 0.4rem 0.5rem;
+    max-width: 100px;
+  }
+
+  .tournament-card {
+    padding: 0.75rem;
+    margin: 0.25rem 0;
+  }
+
+  .tournament-links a {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.8rem;
+  }
+
+  .stats {
+    padding: 0.75rem;
+  }
+
+  .stats p {
+    font-size: 1rem;
+  }
+
+  form {
+    padding: 0.75rem;
+  }
+
+  .result-form {
+    gap: 0.5rem;
+  }
+
+  .teams-grid {
+    gap: 0.75rem;
+  }
+}

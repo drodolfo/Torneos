@@ -1,0 +1,33 @@
+<%- include('../partials/header') %>
+
+<h2>Reglas del Torneo</h2>
+
+<% if (visibleTournaments.length > 1) { %>
+  <div class="tournament-filter">
+    <form method="get" action="/rules">
+      <label>Seleccionar torneo:
+        <select name="tournament">
+          <% visibleTournaments.forEach(t => { %>
+            <option value="<%= t.id %>" <%= t.id == selectedTournament ? 'selected' : '' %>><%= t.name %></option>
+          <% }) %>
+        </select>
+        <button type="submit">Seleccionar</button>
+      </label>
+    </form>
+  </div>
+<% } %>
+
+<% if (!selectedTournament) { %>
+  <p>Selecciona un torneo para ver sus reglas.</p>
+<% } else if (!rules) { %>
+  <p>Este torneo aún no tiene reglas definidas.</p>
+<% } else { %>
+  <div class="rules-content">
+    <h3><%= tournamentName %></h3>
+    <div class="rules-text">
+      <%= rules.replace(/\n/g, '<br>') %>
+    </div>
+  </div>
+<% } %>
+
+<%- include('../partials/footer') %>

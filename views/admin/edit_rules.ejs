@@ -1,0 +1,13 @@
+<%- include('../partials/header') %>
+<h2>Editar Reglas: <%= tournament.name %></h2>
+<form method="post" action="/admin/tournaments/<%= tournament.id %>/rules" class="rules-form">
+  <label>Reglas del torneo:
+    <textarea name="rules" rows="20" cols="80"><%= tournament.rules || '' %></textarea>
+  </label>
+  <button type="submit">Guardar Reglas</button>
+</form>
+<nav class="admin-subnav">
+  <a href="/admin/dashboard" class="subnav-link">← Volver al Panel</a>
+  <a href="/admin/tournaments" class="subnav-link">Volver a Torneos</a>
+</nav>
+<%- include('../partials/footer') %>

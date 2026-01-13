@@ -1,0 +1,63 @@
+<%- include('../partials/header') %>
+<h2>Gestionar Partidos</h2>
+<nav class="admin-subnav">
+  <a href="/admin/dashboard" class="subnav-link">← Volver al Panel</a>
+  <a href="/admin/teams?tournament=<%= selectedTournament %>" class="subnav-link">Gestionar Equipos</a>
+</nav>
+
+<% if (tournaments.length > 0) { %>
+  <form method="get" action="/admin/matches" class="tournament-selector">
+    <label>Seleccionar Torneo:
+      <select name="tournament" onchange="this.form.submit()">
+        <% tournaments.forEach(t => { %>
+          <option value="<%= t.id %>" <%= t.id == selectedTournament ? 'selected' : '' %>><%= t.name %></option>
+        <% }) %>
+      </select>
+    </label>
+  </form>
+<% } %>
+
+<!-- Formulario para planificar partido -->
+<form method="post" action="/admin/matches">
+  <input type="hidden" name="tournament_id" value="<%= selectedTournament %>" />
+  <label>Local
+    <select name="home_team_id" required>
+      <% teams.forEach(t => { %>
+        <option value="<%= t.id %>"><%= t.name %></option>
+      <% }) %>
+    </select>
+  </label>
+  <label>Visitante
+    <select name="away_team_id" required>
+      <% teams.forEach(t => { %>
+        <option value="<%= t.id %>"><%= t.name %></option>
+      <% }) %>
+    </select>
+  </label>
+  <label>Fecha y hora
+    <input type="datetime-local" name="match_date" required />
+  </label>
+  <button type="submit">Planificar partido</button>
+</form>
+
+<!-- Lista de partidos -->
+<h3>Todos los partidos</h3>
+<ul>
+  <% matches.forEach(m => { %>
+    <li>
+      <%= m.home_name %> vs <%= m.away_name %> — <%= formatDateAR(m.match_date) %> — <%= m.status %>
+      <% if (m.status === 'scheduled') { %>
+        <a href="/admin/matches/<%= m.id %>">Cargar resultado</a>
+      <% } else { %>
+        Resultado: <%= m.home_goals %> - <%= m.away_goals %>
+        <a href="/admin/matches/<%= m.id %>">Editar resultado</a>
+        <form method="post" action="/admin/matches/<%= m.id %>/undo" style="display:inline;" 
+              onsubmit="return confirm('¿Seguro que quieres deshacer este resultado?')">
+          <button type="submit">Deshacer resultado</button>
+        </form>
+      <% } %>
+    </li>
+  <% }) %>
+</ul>
+
+<%- include('../partials/footer') %>

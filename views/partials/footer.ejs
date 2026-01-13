@@ -1,0 +1,95 @@
+</main>
+<footer>© <%= new Date().getFullYear() %> Torneo de Fútbol</footer>
+
+<script>
+// Theme management
+class ThemeManager {
+  constructor() {
+    this.theme = localStorage.getItem('theme') || 'auto';
+    this.init();
+  }
+
+  init() {
+    this.applyTheme(this.theme);
+    this.setupEventListeners();
+    this.updateActiveButton();
+  }
+
+  setupEventListeners() {
+    document.getElementById('theme-light').addEventListener('click', () => this.setTheme('light'));
+    document.getElementById('theme-dark').addEventListener('click', () => this.setTheme('dark'));
+    document.getElementById('theme-auto').addEventListener('click', () => this.setTheme('auto'));
+  }
+
+  setTheme(theme) {
+    this.theme = theme;
+    localStorage.setItem('theme', theme);
+    this.applyTheme(theme);
+    this.updateActiveButton();
+  }
+
+  applyTheme(theme) {
+    const root = document.documentElement;
+
+    if (theme === 'auto') {
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      root.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+    } else {
+      root.setAttribute('data-theme', theme);
+    }
+  }
+
+  updateActiveButton() {
+    document.querySelectorAll('.theme-selector button').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    document.getElementById(`theme-${this.theme}`).classList.add('active');
+  }
+}
+
+// Mobile menu functionality
+class MobileMenu {
+  constructor() {
+    this.toggle = document.getElementById('mobile-menu-toggle');
+    this.nav = document.getElementById('main-nav');
+    this.init();
+  }
+
+  init() {
+    if (this.toggle && this.nav) {
+      this.toggle.addEventListener('click', () => this.toggleMenu());
+      // Close menu when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!this.nav.contains(e.target) && !this.toggle.contains(e.target)) {
+          this.nav.classList.remove('show');
+        }
+      });
+      // Close menu when clicking a link
+      this.nav.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => this.nav.classList.remove('show'));
+      });
+    }
+  }
+
+  toggleMenu() {
+    this.nav.classList.toggle('show');
+  }
+}
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+  new ThemeManager();
+  new MobileMenu();
+
+  // Listen for system theme changes when in auto mode
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    const currentTheme = localStorage.getItem('theme') || 'auto';
+    if (currentTheme === 'auto') {
+      document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+    }
+  });
+});
+</script>
+
+</body>
+</html>

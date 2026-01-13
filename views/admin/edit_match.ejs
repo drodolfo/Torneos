@@ -1,0 +1,17 @@
+<%- include('../partials/header') %>
+<h2>Editar Resultado: <%= match.home_name %> vs <%= match.away_name %></h2>
+<p><strong>Fecha:</strong> <%= formatDateAR(match.match_date) %></p>
+<form method="post" action="/admin/matches/<%= match.id %>/result" class="result-form">
+  <label>Goles de <%= match.home_name %>
+    <input type="number" name="home_goals" min="0" required value="<%= match.home_goals ?? '' %>" />
+  </label>
+  <label>Goles de <%= match.away_name %>
+    <input type="number" name="away_goals" min="0" required value="<%= match.away_goals ?? '' %>" />
+  </label>
+  <button type="submit">Guardar Resultado</button>
+</form>
+<nav class="admin-subnav">
+  <a href="/admin/dashboard" class="subnav-link">← Volver al Panel</a>
+  <a href="/admin/matches" class="subnav-link">Volver a Partidos</a>
+</nav>
+<%- include('../partials/footer') %>

@@ -1,0 +1,25 @@
+<%- include('../partials/header') %>
+<h2>Próximos partidos</h2>
+
+<% if (visibleTournaments.length > 1) { %>
+  <div class="tournament-filter">
+    <form method="get" action="/fixtures">
+      <label>Filtrar por torneo:
+        <select name="tournament">
+          <% visibleTournaments.forEach(t => { %>
+            <option value="<%= t.id %>" <%= t.id == selectedTournament ? 'selected' : '' %>><%= t.name %></option>
+          <% }) %>
+        </select>
+        <button type="submit">Filtrar</button>
+      </label>
+    </form>
+  </div>
+<% } %>
+
+<ul>
+  <% if (fixtures.length === 0) { %><li>No hay partidos programados en torneos visibles.</li><% } %>
+  <% fixtures.forEach(f => { %>
+    <li><strong><%= f.home_name %></strong> vs <strong><%= f.away_name %></strong> — <%= formatDateAR(f.match_date) %> (<%= f.tournament_name %>)</li>
+  <% }) %>
+</ul>
+<%- include('../partials/footer') %>

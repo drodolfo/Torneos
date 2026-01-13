@@ -1,0 +1,14 @@
+<%- include('../partials/header') %>
+
+<h2>Perfil del equipo: <%= team.name %></h2>
+
+<div class="team-profile">
+  <p><strong>Responsable:</strong> <%= team.user_name || 'N/A' %></p>
+  <p><strong>Edad promedio:</strong> <%= team.edad || 'N/A' %></p>
+  <p><strong>Locación:</strong> <%= team.locacion || 'N/A' %></p>
+  <p><strong>Contacto:</strong> <%= team.contacto || 'N/A' %></p>
+</div>
+
+<a href="/table">← Volver a la tabla</a>
+
+<%- include('../partials/footer') %>

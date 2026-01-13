@@ -1,0 +1,40 @@
+<%- include('../partials/header') %>
+
+<h2>Equipos del Torneo</h2>
+
+<% if (visibleTournaments.length > 1) { %>
+  <div class="tournament-filter">
+    <form method="get" action="/tournament-teams">
+      <label>Seleccionar torneo:
+        <select name="tournament">
+          <% visibleTournaments.forEach(t => { %>
+            <option value="<%= t.id %>" <%= t.id == selectedTournament ? 'selected' : '' %>><%= t.name %></option>
+          <% }) %>
+        </select>
+        <button type="submit">Seleccionar</button>
+      </label>
+    </form>
+  </div>
+<% } %>
+
+<% if (!selectedTournament) { %>
+  <p>Selecciona un torneo para ver sus equipos.</p>
+<% } else if (teams.length === 0) { %>
+  <p>No hay equipos registrados en este torneo.</p>
+<% } else { %>
+  <div class="teams-grid">
+    <% teams.forEach(team => { %>
+      <div class="team-card">
+        <h3><%= team.name %></h3>
+        <div class="team-info">
+          <p><strong>Usuario:</strong> <%= team.user_name || 'N/A' %></p>
+          <p><strong>Edad promedio:</strong> <%= team.edad || 'N/A' %></p>
+          <p><strong>Localidad:</strong> <%= team.locacion || 'N/A' %></p>
+          <p><strong>Contacto:</strong> <%= team.contacto || 'N/A' %></p>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+<% } %>
+
+<%- include('../partials/footer') %>

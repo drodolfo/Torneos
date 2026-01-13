@@ -1,0 +1,25 @@
+<%- include('../partials/header') %>
+<h2>Resultados recientes</h2>
+
+<% if (visibleTournaments.length > 1) { %>
+  <div class="tournament-filter">
+    <form method="get" action="/results">
+      <label>Filtrar por torneo:
+        <select name="tournament">
+          <% visibleTournaments.forEach(t => { %>
+            <option value="<%= t.id %>" <%= t.id == selectedTournament ? 'selected' : '' %>><%= t.name %></option>
+          <% }) %>
+        </select>
+        <button type="submit">Filtrar</button>
+      </label>
+    </form>
+  </div>
+<% } %>
+
+<ul>
+  <% if (results.length === 0) { %><li>No hay resultados aún en torneos visibles.</li><% } %>
+  <% results.forEach(r => { %>
+    <li><strong><%= r.home_name %></strong> <%= r.home_goals %> - <%= r.away_goals %> <strong><%= r.away_name %></strong> — <%= formatDateAR(r.match_date) %> (<%= r.tournament_name %>)</li>
+  <% }) %>
+</ul>
+<%- include('../partials/footer') %>

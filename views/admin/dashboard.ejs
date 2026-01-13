@@ -1,0 +1,34 @@
+<%- include('../partials/header') %>
+<h2>Panel de Administración</h2>
+
+<% if (tournaments.length > 0) { %>
+  <form method="get" action="/admin/dashboard" class="tournament-selector">
+    <label>Seleccionar Torneo:
+      <select name="tournament" onchange="this.form.submit()">
+        <% tournaments.forEach(t => { %>
+          <option value="<%= t.id %>" <%= t.id == selectedTournament ? 'selected' : '' %>><%= t.name %></option>
+        <% }) %>
+      </select>
+    </label>
+  </form>
+<% } %>
+
+<div class="stats">
+  <p><strong>Torneo Actual:</strong> <%= currentTournament ? currentTournament.name : 'Ninguno' %></p>
+  <p><strong>Equipos en Torneo:</strong> <%= teamsCount %></p>
+  <p><strong>Partidos en Torneo:</strong> <%= matchesCount %></p>
+</div>
+
+<nav class="admin-nav">
+  <a href="/admin/tournaments" class="admin-link">Gestionar Torneos</a>
+  <a href="/admin/teams?tournament=<%= selectedTournament %>" class="admin-link">Gestionar Equipos</a>
+  <a href="/admin/matches?tournament=<%= selectedTournament %>" class="admin-link">Gestionar Partidos</a>
+  <a href="/" class="admin-link">Ver Sitio Público</a>
+  <a href="/table" class="admin-link">Ver Tabla de Posiciones</a>
+  <a href="/results" class="admin-link">Ver Resultados</a>
+  <a href="/fixtures" class="admin-link">Ver Próximos Partidos</a>
+</nav>
+<form method="post" action="/admin/logout" class="logout-form">
+  <button type="submit" class="logout-btn">Cerrar Sesión</button>
+</form>
+<%- include('../partials/footer') %>

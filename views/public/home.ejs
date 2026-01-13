@@ -1,0 +1,46 @@
+<%- include('../partials/header') %>
+
+ <div class="home" style="background: var(--bg-secondary); padding: 2rem; border-radius: 12px; margin-bottom: 2rem;">
+   <h1 style="color: var(--text-primary);">Bienvenido al Torneo de Fútbol</h1>
+   <p style="color: var(--text-secondary);">Explora los torneos disponibles y accede a sus tablas de posiciones, resultados y próximos partidos.</p>
+ </div>
+
+ <% if (tournaments && tournaments.length > 0) { %>
+   <div class="tournaments-section p-8">
+     <h2 class="text-slate-100 mb-4">Torneos Disponibles</h2>
+     <% tournaments.forEach(tournament => { %>
+       <div class="tournament-card">
+         <h3 style="color: var(--text-primary); font-size: 1.25rem; font-weight: bold; margin-bottom: 0.5rem;"><%= tournament.name %></h3>
+         <div class="tournament-links mb-4">
+            <a href="/table?tournament=<%= tournament.id %>">
+              <i class="fas fa-table"></i> Ver Tabla
+            </a>
+            <a href="/results?tournament=<%= tournament.id %>">
+              <i class="fas fa-trophy"></i> Ver Resultados
+            </a>
+            <a href="/fixtures?tournament=<%= tournament.id %>">
+              <i class="fas fa-calendar"></i> Ver Partidos
+            </a>
+            <a href="/tournament-teams?tournament=<%= tournament.id %>">
+              <i class="fas fa-users"></i> Ver Equipos
+            </a>
+            <a href="/rules?tournament=<%= tournament.id %>">
+              <i class="fas fa-book"></i> Ver Reglas
+            </a>
+         </div>
+         <% if (tournament.rules) { %>
+           <div class="rules-content">
+             <h4 class="font-semibold mb-1">Reglas:</h4>
+             <div class="rules-text">
+               <%= tournament.rules.replace(/\n/g, '<br>') %>
+             </div>
+           </div>
+         <% } else { %>
+           <p style="color: var(--text-muted); font-style: italic;">Este torneo aún no tiene reglas definidas.</p>
+         <% } %>
+       </div>
+     <% }) %>
+   </div>
+ <% } %>
+
+<%- include('../partials/footer') %>
