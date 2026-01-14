@@ -1,10 +1,7 @@
 import { Pool } from 'pg';
 import config from './config.js';
 
-console.log('DATABASE_URL:', process.env.DATABASE_URL);
-if (!config.databaseUrl) {
-  throw new Error('DATABASE_URL is required. Set it in your environment variables.');
-}
+// Note: DATABASE_URL must be set in environment variables for production
 
 export const pool = new Pool({
   connectionString: config.databaseUrl,
