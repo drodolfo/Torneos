@@ -1,5 +1,7 @@
 import 'dotenv/config';
 
+console.log('process.env.DATABASE_URL:', process.env.DATABASE_URL);
+
 export default {
   sessionSecret: process.env.SESSION_SECRET || 'change-me',
   databaseUrl: process.env.DATABASE_URL,
