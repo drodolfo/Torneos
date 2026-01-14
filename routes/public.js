@@ -5,8 +5,13 @@ const router = express.Router();
 
 // --- Home page ---
 router.get('/', async (req, res) => {
-  const visibleTournaments = (await query('SELECT id, name, rules FROM tournaments WHERE visible = true ORDER BY name')).rows;
-  res.render('public/home', { tournaments: visibleTournaments });
+  try {
+    const visibleTournaments = (await query('SELECT id, name, rules FROM tournaments WHERE visible = true ORDER BY name')).rows;
+    res.render('public/home', { tournaments: visibleTournaments });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Internal Server Error');
+  }
 });
 
 router.get('/inicio', async (req, res) => {
@@ -16,47 +21,52 @@ router.get('/inicio', async (req, res) => {
 
 // --- Tabla de posiciones ---
 router.get('/table', async (req, res) => {
-  const visibleTournaments = (await query('SELECT id, name FROM tournaments WHERE visible = true ORDER BY name')).rows;
-  const selectedTournament = req.query.tournament && visibleTournaments.some(t => t.id == req.query.tournament) ? req.query.tournament : null;
-  let table = [];
-  if (selectedTournament) {
-    const querySql = `
-      SELECT t.id,
-             t.name,
-             t.user_name,
-             tr.name AS tournament_name,
-             COUNT(m.id) AS played,
-             SUM(CASE
-                   WHEN (m.home_team_id = t.id AND m.home_goals > m.away_goals)
-                     OR (m.away_team_id = t.id AND m.away_goals > m.home_goals)
-                   THEN 1 ELSE 0 END) AS wins,
-             SUM(CASE WHEN m.home_goals = m.away_goals THEN 1 ELSE 0 END) AS draws,
-             SUM(CASE
-                   WHEN (m.home_team_id = t.id AND m.home_goals < m.away_goals)
-                     OR (m.away_team_id = t.id AND m.away_goals < m.home_goals)
-                   THEN 1 ELSE 0 END) AS losses,
-             SUM(CASE WHEN m.home_team_id = t.id THEN m.home_goals ELSE m.away_goals END) AS gf,
-             SUM(CASE WHEN m.home_team_id = t.id THEN m.away_goals ELSE m.home_goals END) AS ga,
-             SUM(CASE WHEN m.home_team_id = t.id THEN m.home_goals - m.away_goals
-                      ELSE m.away_goals - m.home_goals END) AS gd,
-             SUM(CASE
-                   WHEN (m.home_team_id = t.id AND m.home_goals > m.away_goals)
-                     OR (m.away_team_id = t.id AND m.away_goals > m.home_goals)
-                   THEN 3
-                   WHEN m.home_goals = m.away_goals THEN 1
-                   ELSE 0 END) AS points
-      FROM teams t
-      JOIN tournaments tr ON t.tournament_id = tr.id
-      LEFT JOIN matches m ON t.id IN (m.home_team_id, m.away_team_id)
-      WHERE t.tournament_id = $1
-      GROUP BY t.id, t.name, t.user_name, tr.name
-      ORDER BY points DESC, gd DESC, gf DESC
-    `;
-    const result = await query(querySql, [selectedTournament]);
-    table = result.rows;
-  }
+  try {
+    const visibleTournaments = (await query('SELECT id, name FROM tournaments WHERE visible = true ORDER BY name')).rows;
+    const selectedTournament = req.query.tournament && visibleTournaments.some(t => t.id == req.query.tournament) ? req.query.tournament : null;
+    let table = [];
+    if (selectedTournament) {
+      const querySql = `
+        SELECT t.id,
+               t.name,
+               t.user_name,
+               tr.name AS tournament_name,
+               COUNT(m.id) AS played,
+               SUM(CASE
+                     WHEN (m.home_team_id = t.id AND m.home_goals > m.away_goals)
+                       OR (m.away_team_id = t.id AND m.away_goals > m.home_goals)
+                     THEN 1 ELSE 0 END) AS wins,
+               SUM(CASE WHEN m.home_goals = m.away_goals THEN 1 ELSE 0 END) AS draws,
+               SUM(CASE
+                     WHEN (m.home_team_id = t.id AND m.home_goals < m.away_goals)
+                       OR (m.away_team_id = t.id AND m.away_goals < m.home_goals)
+                     THEN 1 ELSE 0 END) AS losses,
+               SUM(CASE WHEN m.home_team_id = t.id THEN m.home_goals ELSE m.away_goals END) AS gf,
+               SUM(CASE WHEN m.home_team_id = t.id THEN m.away_goals ELSE m.home_goals END) AS ga,
+               SUM(CASE WHEN m.home_team_id = t.id THEN m.home_goals - m.away_goals
+                        ELSE m.away_goals - m.home_goals END) AS gd,
+               SUM(CASE
+                     WHEN (m.home_team_id = t.id AND m.home_goals > m.away_goals)
+                       OR (m.away_team_id = t.id AND m.away_goals > m.home_goals)
+                     THEN 3
+                     WHEN m.home_goals = m.away_goals THEN 1
+                     ELSE 0 END) AS points
+        FROM teams t
+        JOIN tournaments tr ON t.tournament_id = tr.id
+        LEFT JOIN matches m ON t.id IN (m.home_team_id, m.away_team_id)
+        WHERE t.tournament_id = $1
+        GROUP BY t.id, t.name, t.user_name, tr.name
+        ORDER BY points DESC, gd DESC, gf DESC
+      `;
+      const result = await query(querySql, [selectedTournament]);
+      table = result.rows;
+    }
 
-  res.render('public/table', { table, visibleTournaments, selectedTournament });
+    res.render('public/table', { table, visibleTournaments, selectedTournament });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Internal Server Error');
+  }
 });
 
 // --- Perfil de equipo ---

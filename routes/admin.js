@@ -36,15 +36,20 @@ router.post('/logout', (req, res) => {
 
 // --- DASHBOARD ---
 router.get('/dashboard', requireAdmin, async (req, res) => {
-  const tournaments = (await query('SELECT * FROM tournaments ORDER BY name')).rows;
-  let selectedTournament = req.query.tournament;
-  if (!selectedTournament || !tournaments.some(t => t.id == selectedTournament)) {
-    selectedTournament = tournaments[0]?.id || null;
+  try {
+    const tournaments = (await query('SELECT * FROM tournaments ORDER BY name')).rows;
+    let selectedTournament = req.query.tournament;
+    if (!selectedTournament || !tournaments.some(t => t.id == selectedTournament)) {
+      selectedTournament = tournaments[0]?.id || null;
+    }
+    const teamsCount = selectedTournament ? (await query('SELECT COUNT(*) FROM teams WHERE tournament_id = $1', [selectedTournament])).rows[0].count : 0;
+    const matchesCount = selectedTournament ? (await query('SELECT COUNT(*) FROM matches WHERE tournament_id = $1', [selectedTournament])).rows[0].count : 0;
+    const currentTournament = selectedTournament ? tournaments.find(t => t.id == selectedTournament) : null;
+    res.render('admin/dashboard', { teamsCount, matchesCount, tournaments, selectedTournament, currentTournament });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Internal Server Error');
   }
-  const teamsCount = selectedTournament ? (await query('SELECT COUNT(*) FROM teams WHERE tournament_id = $1', [selectedTournament])).rows[0].count : 0;
-  const matchesCount = selectedTournament ? (await query('SELECT COUNT(*) FROM matches WHERE tournament_id = $1', [selectedTournament])).rows[0].count : 0;
-  const currentTournament = selectedTournament ? tournaments.find(t => t.id == selectedTournament) : null;
-  res.render('admin/dashboard', { teamsCount, matchesCount, tournaments, selectedTournament, currentTournament });
 });
 
 // --- GESTIONAR TORNEOS ---
