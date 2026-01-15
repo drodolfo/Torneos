@@ -21,9 +21,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 
 // Sessions (cookie-based for serverless-friendly usage)
+const sessionSecret = config.sessionSecret || 'fallback-secret-change-in-production';
+if (!config.sessionSecret) {
+  console.warn('WARNING: SESSION_SECRET not set, using fallback secret');
+}
 app.use(cookieSession({
   name: 'session',
-  keys: [config.sessionSecret],
+  keys: [sessionSecret],
   httpOnly: true,
   sameSite: 'lax',
   maxAge: 1000 * 60 * 60 * 12 // 12 hours
@@ -45,6 +49,17 @@ app.locals.formatDateAR = (dateStr) => {
 // Routes
 app.use('/', publicRoutes);
 app.use('/admin', adminRoutes);
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).send('Página no encontrada');
+});
+
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error('Unhandled error:', err);
+  res.status(500).send('Internal Server Error');
+});
 
 // Export for Vercel (serverless function)
 export default app;
