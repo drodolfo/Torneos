@@ -9,8 +9,18 @@ router.get('/', async (req, res) => {
     const visibleTournaments = (await query('SELECT id, name, rules FROM tournaments WHERE visible = true ORDER BY name')).rows;
     res.render('public/home', { tournaments: visibleTournaments });
   } catch (err) {
-    console.error(err);
-    res.status(500).send('Internal Server Error');
+    console.error('Error in route:', req.path);
+    console.error('Error details:', err);
+    console.error('Error stack:', err.stack);
+    
+    // Provide more helpful error messages
+    if (err.code === 'DATABASE_URL_MISSING' || err.message?.includes('DATABASE_URL')) {
+      res.status(500).send('Database configuration error. Please contact the administrator.');
+    } else if (err.code === 'ENOTFOUND' || err.code === 'ECONNREFUSED' || err.code === 'ETIMEDOUT') {
+      res.status(500).send('Database connection error. Please try again later.');
+    } else {
+      res.status(500).send('Internal Server Error');
+    }
   }
 });
 
@@ -19,7 +29,9 @@ router.get('/inicio', async (req, res) => {
     const visibleTournaments = (await query('SELECT id, name, rules FROM tournaments WHERE visible = true ORDER BY name')).rows;
     res.render('public/home', { tournaments: visibleTournaments });
   } catch (err) {
-    console.error(err);
+    console.error('Error in route:', req.path);
+    console.error('Error details:', err);
+    console.error('Error stack:', err.stack);
     res.status(500).send('Internal Server Error');
   }
 });
@@ -69,7 +81,9 @@ router.get('/table', async (req, res) => {
 
     res.render('public/table', { table, visibleTournaments, selectedTournament });
   } catch (err) {
-    console.error(err);
+    console.error('Error in route:', req.path);
+    console.error('Error details:', err);
+    console.error('Error stack:', err.stack);
     res.status(500).send('Internal Server Error');
   }
 });
@@ -83,7 +97,9 @@ router.get('/team/:id', async (req, res) => {
 
     res.render('public/team_profile', { team });
   } catch (err) {
-    console.error(err);
+    console.error('Error in route:', req.path);
+    console.error('Error details:', err);
+    console.error('Error stack:', err.stack);
     res.status(500).send('Internal Server Error');
   }
 });
@@ -122,7 +138,9 @@ router.get('/results', async (req, res) => {
 
     res.render('public/results', { results, visibleTournaments, selectedTournament });
   } catch (err) {
-    console.error(err);
+    console.error('Error in route:', req.path);
+    console.error('Error details:', err);
+    console.error('Error stack:', err.stack);
     res.status(500).send('Internal Server Error');
   }
 });
@@ -161,7 +179,9 @@ router.get('/fixtures', async (req, res) => {
 
     res.render('public/fixtures', { fixtures, visibleTournaments, selectedTournament });
   } catch (err) {
-    console.error(err);
+    console.error('Error in route:', req.path);
+    console.error('Error details:', err);
+    console.error('Error stack:', err.stack);
     res.status(500).send('Internal Server Error');
   }
 });
@@ -183,7 +203,9 @@ router.get('/rules', async (req, res) => {
 
     res.render('public/rules', { rules, tournamentName, visibleTournaments, selectedTournament });
   } catch (err) {
-    console.error(err);
+    console.error('Error in route:', req.path);
+    console.error('Error details:', err);
+    console.error('Error stack:', err.stack);
     res.status(500).send('Internal Server Error');
   }
 });
@@ -205,7 +227,9 @@ router.get('/tournament-teams', async (req, res) => {
 
     res.render('public/tournament_teams', { teams, tournamentName, visibleTournaments, selectedTournament });
   } catch (err) {
-    console.error(err);
+    console.error('Error in route:', req.path);
+    console.error('Error details:', err);
+    console.error('Error stack:', err.stack);
     res.status(500).send('Internal Server Error');
   }
 });

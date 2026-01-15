@@ -55,6 +55,13 @@ function getPool() {
 export async function query(text, params) {
   let client;
   try {
+    // Check if DATABASE_URL is set before attempting connection
+    if (!config.databaseUrl) {
+      const error = new Error('DATABASE_URL is not configured. Please set it in your Vercel environment variables.');
+      error.code = 'DATABASE_URL_MISSING';
+      throw error;
+    }
+    
     const poolInstance = getPool();
     client = await poolInstance.connect();
     const res = await client.query(text, params);
@@ -74,6 +81,8 @@ export async function query(text, params) {
       console.error('Connection refused. Check that the database server is running and accessible.');
     } else if (err.code === 'ETIMEDOUT') {
       console.error('Connection timeout. Check network connectivity and firewall settings.');
+    } else if (err.code === 'DATABASE_URL_MISSING') {
+      console.error('DATABASE_URL environment variable is not set in Vercel.');
     }
     
     // If connection error, reset pool to allow reconnection

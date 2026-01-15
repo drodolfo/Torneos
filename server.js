@@ -59,6 +59,15 @@ app.locals.formatDateAR = (dateStr) => {
   });
 };
 
+// Health check endpoint (doesn't require database)
+app.get('/health', (req, res) => {
+  res.status(200).json({ 
+    status: 'ok', 
+    timestamp: new Date().toISOString(),
+    databaseUrl: config.databaseUrl ? 'configured' : 'not configured'
+  });
+});
+
 // Routes
 app.use('/', publicRoutes);
 app.use('/admin', adminRoutes);
@@ -71,7 +80,13 @@ app.use((req, res) => {
 // Global error handler
 app.use((err, req, res, next) => {
   console.error('Unhandled error:', err);
-  res.status(500).send('Internal Server Error');
+  console.error('Error stack:', err.stack);
+  console.error('Request URL:', req.url);
+  console.error('Request method:', req.method);
+  
+  // Don't send error details in production, but log them
+  const errorMessage = process.env.NODE_ENV === 'development' ? err.message : 'Internal Server Error';
+  res.status(500).send(errorMessage);
 });
 
 // Export for Vercel (serverless function)

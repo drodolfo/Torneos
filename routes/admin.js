@@ -28,7 +28,9 @@ router.post('/login', async (req, res) => {
       res.render('admin/login', { error: 'Credenciales inválidas' });
     }
   } catch (err) {
-    console.error(err);
+    console.error('Error in route:', req.path);
+    console.error('Error details:', err);
+    console.error('Error stack:', err.stack);
     res.status(500).send('Internal Server Error');
   }
 });
@@ -51,7 +53,9 @@ router.get('/dashboard', requireAdmin, async (req, res) => {
     const currentTournament = selectedTournament ? tournaments.find(t => t.id == selectedTournament) : null;
     res.render('admin/dashboard', { teamsCount, matchesCount, tournaments, selectedTournament, currentTournament });
   } catch (err) {
-    console.error(err);
+    console.error('Error in route:', req.path);
+    console.error('Error details:', err);
+    console.error('Error stack:', err.stack);
     res.status(500).send('Internal Server Error');
   }
 });
@@ -62,7 +66,9 @@ router.get('/tournaments', requireAdmin, async (req, res) => {
     const tournaments = (await query('SELECT * FROM tournaments ORDER BY created_at DESC')).rows;
     res.render('admin/tournaments', { tournaments });
   } catch (err) {
-    console.error(err);
+    console.error('Error in route:', req.path);
+    console.error('Error details:', err);
+    console.error('Error stack:', err.stack);
     res.status(500).send('Internal Server Error');
   }
 });
@@ -73,7 +79,9 @@ router.post('/tournaments', requireAdmin, async (req, res) => {
     await query('INSERT INTO tournaments (name) VALUES ($1)', [name.trim()]);
     res.redirect('/admin/tournaments');
   } catch (err) {
-    console.error(err);
+    console.error('Error in route:', req.path);
+    console.error('Error details:', err);
+    console.error('Error stack:', err.stack);
     res.status(500).send('Internal Server Error');
   }
 });
@@ -83,7 +91,9 @@ router.post('/tournaments/:id/toggle', requireAdmin, async (req, res) => {
     await query('UPDATE tournaments SET visible = NOT visible WHERE id = $1', [req.params.id]);
     res.redirect('/admin/tournaments');
   } catch (err) {
-    console.error(err);
+    console.error('Error in route:', req.path);
+    console.error('Error details:', err);
+    console.error('Error stack:', err.stack);
     res.status(500).send('Internal Server Error');
   }
 });
@@ -93,7 +103,9 @@ router.post('/tournaments/:id/delete', requireAdmin, async (req, res) => {
     await query('DELETE FROM tournaments WHERE id = $1', [req.params.id]);
     res.redirect('/admin/tournaments');
   } catch (err) {
-    console.error(err);
+    console.error('Error in route:', req.path);
+    console.error('Error details:', err);
+    console.error('Error stack:', err.stack);
     res.status(500).send('Internal Server Error');
   }
 });
@@ -106,7 +118,9 @@ router.get('/tournaments/:id/rules', requireAdmin, async (req, res) => {
     if (!tournament) return res.status(404).send('Torneo no encontrado');
     res.render('admin/edit_rules', { tournament });
   } catch (err) {
-    console.error(err);
+    console.error('Error in route:', req.path);
+    console.error('Error details:', err);
+    console.error('Error stack:', err.stack);
     res.status(500).send('Internal Server Error');
   }
 });
@@ -117,7 +131,9 @@ router.post('/tournaments/:id/rules', requireAdmin, async (req, res) => {
     await query('UPDATE tournaments SET rules = $1 WHERE id = $2', [rules, req.params.id]);
     res.redirect('/admin/tournaments');
   } catch (err) {
-    console.error(err);
+    console.error('Error in route:', req.path);
+    console.error('Error details:', err);
+    console.error('Error stack:', err.stack);
     res.status(500).send('Internal Server Error');
   }
 });
@@ -133,7 +149,9 @@ router.get('/teams', requireAdmin, async (req, res) => {
     const teams = selectedTournament ? (await query('SELECT * FROM teams WHERE tournament_id = $1 ORDER BY name', [selectedTournament])).rows : [];
     res.render('admin/teams', { teams, tournaments, selectedTournament });
   } catch (err) {
-    console.error(err);
+    console.error('Error in route:', req.path);
+    console.error('Error details:', err);
+    console.error('Error stack:', err.stack);
     res.status(500).send('Internal Server Error');
   }
 });
@@ -163,7 +181,9 @@ router.post('/teams', requireAdmin, async (req, res) => {
     );
     res.redirect('/admin/teams?tournament=' + tournament_id);
   } catch (err) {
-    console.error(err);
+    console.error('Error in route:', req.path);
+    console.error('Error details:', err);
+    console.error('Error stack:', err.stack);
     res.status(500).send('Internal Server Error');
   }
 });
@@ -173,7 +193,9 @@ router.post('/teams/:id/delete', requireAdmin, async (req, res) => {
     await query('DELETE FROM teams WHERE id = $1', [req.params.id]);
     res.redirect('/admin/teams');
   } catch (err) {
-    console.error(err);
+    console.error('Error in route:', req.path);
+    console.error('Error details:', err);
+    console.error('Error stack:', err.stack);
     res.status(500).send('Internal Server Error');
   }
 });
@@ -200,7 +222,9 @@ router.get('/matches', requireAdmin, async (req, res) => {
     )).rows : [];
     res.render('admin/matches', { teams, matches, tournaments, selectedTournament });
   } catch (err) {
-    console.error(err);
+    console.error('Error in route:', req.path);
+    console.error('Error details:', err);
+    console.error('Error stack:', err.stack);
     res.status(500).send('Internal Server Error');
   }
 });
@@ -235,7 +259,9 @@ router.post('/matches', requireAdmin, async (req, res) => {
     );
     res.redirect('/admin/matches?tournament=' + tournament_id);
   } catch (err) {
-    console.error(err);
+    console.error('Error in route:', req.path);
+    console.error('Error details:', err);
+    console.error('Error stack:', err.stack);
     res.status(500).send('Internal Server Error');
   }
 });
@@ -255,7 +281,9 @@ router.get('/matches/:id', requireAdmin, async (req, res) => {
     const teams = (await query('SELECT * FROM teams ORDER BY name')).rows;
     res.render('admin/edit_match', { match, teams });
   } catch (err) {
-    console.error(err);
+    console.error('Error in route:', req.path);
+    console.error('Error details:', err);
+    console.error('Error stack:', err.stack);
     res.status(500).send('Internal Server Error');
   }
 });
@@ -270,7 +298,9 @@ router.post('/matches/:id/result', requireAdmin, async (req, res) => {
     );
     res.redirect('/admin/matches');
   } catch (err) {
-    console.error(err);
+    console.error('Error in route:', req.path);
+    console.error('Error details:', err);
+    console.error('Error stack:', err.stack);
     res.status(500).send('Internal Server Error');
   }
 });
@@ -284,7 +314,9 @@ router.post('/matches/:id/undo', requireAdmin, async (req, res) => {
     );
     res.redirect('/admin/matches');
   } catch (err) {
-    console.error(err);
+    console.error('Error in route:', req.path);
+    console.error('Error details:', err);
+    console.error('Error stack:', err.stack);
     res.status(500).send('Internal Server Error');
   }
 });
