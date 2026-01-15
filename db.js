@@ -20,9 +20,19 @@ function resetPool() {
 function getPool() {
   if (!pool) {
     if (!config.databaseUrl) {
-      throw new Error('DATABASE_URL is not set in environment variables');
+      const error = new Error('DATABASE_URL environment variable is not set. Please configure it in your Vercel project settings.');
+      console.error(error.message);
+      throw error;
     }
     
+    // Validate DATABASE_URL format
+    if (!config.databaseUrl.startsWith('postgresql://') && !config.databaseUrl.startsWith('postgres://')) {
+      const error = new Error('DATABASE_URL must be a valid PostgreSQL connection string starting with postgresql:// or postgres://');
+      console.error(error.message);
+      throw error;
+    }
+    
+    console.log('Initializing database connection pool...');
     pool = new Pool({
       connectionString: config.databaseUrl,
       ssl: { rejectUnauthorized: false }, // needed for many hosted Postgres providers
@@ -51,10 +61,23 @@ export async function query(text, params) {
     return res;
   } catch (err) {
     console.error('Database query error:', err);
+    console.error('Error code:', err.code);
+    console.error('Error message:', err.message);
     console.error('Query:', text);
     console.error('Params:', params);
+    
+    // Handle specific error types
+    if (err.code === 'ENOTFOUND') {
+      console.error('DNS resolution failed. Check that DATABASE_URL contains a valid hostname.');
+      console.error('Current DATABASE_URL format:', config.databaseUrl ? 'Set (but hostname not resolvable)' : 'Not set');
+    } else if (err.code === 'ECONNREFUSED') {
+      console.error('Connection refused. Check that the database server is running and accessible.');
+    } else if (err.code === 'ETIMEDOUT') {
+      console.error('Connection timeout. Check network connectivity and firewall settings.');
+    }
+    
     // If connection error, reset pool to allow reconnection
-    if (err.code === 'ECONNREFUSED' || err.code === 'ETIMEDOUT' || err.message?.includes('connection')) {
+    if (err.code === 'ECONNREFUSED' || err.code === 'ETIMEDOUT' || err.code === 'ENOTFOUND' || err.message?.includes('connection')) {
       resetPool();
     }
     throw err;

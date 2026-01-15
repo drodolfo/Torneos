@@ -6,6 +6,19 @@ import config from './config.js';
 import adminRoutes from './routes/admin.js';
 import publicRoutes from './routes/public.js';
 
+// Validate required environment variables at startup
+if (!config.databaseUrl) {
+  console.error('========================================');
+  console.error('ERROR: DATABASE_URL is not set!');
+  console.error('========================================');
+  console.error('Please set the DATABASE_URL environment variable in your Vercel project:');
+  console.error('1. Go to your Vercel project settings');
+  console.error('2. Navigate to Environment Variables');
+  console.error('3. Add DATABASE_URL with your PostgreSQL connection string');
+  console.error('   Format: postgresql://user:password@host:port/database');
+  console.error('========================================');
+}
+
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
