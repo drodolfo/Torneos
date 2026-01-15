@@ -1,5 +1,5 @@
 import express from 'express';
-import session from 'express-session';
+import cookieSession from 'cookie-session';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import config from './config.js';
@@ -20,16 +20,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Body parsing
 app.use(express.urlencoded({ extended: true }));
 
-// Sessions (cookie-only store for serverless-friendly usage)
-app.use(session({
-  secret: config.sessionSecret,
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    httpOnly: true,
-    sameSite: 'lax',
-    maxAge: 1000 * 60 * 60 * 12
-  }
+// Sessions (cookie-based for serverless-friendly usage)
+app.use(cookieSession({
+  name: 'session',
+  keys: [config.sessionSecret],
+  httpOnly: true,
+  sameSite: 'lax',
+  maxAge: 1000 * 60 * 60 * 12 // 12 hours
 }));
 
 // Argentina date helper
@@ -49,11 +46,12 @@ app.locals.formatDateAR = (dateStr) => {
 app.use('/', publicRoutes);
 app.use('/admin', adminRoutes);
 
-// Export for Vercel
+// Export for Vercel (serverless function)
 export default app;
 
 // Local development: start a listener
-if (process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'test') {
+// Vercel sets NODE_ENV to 'production', so this won't run in production
+if (!process.env.VERCEL && process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'test') {
   const port = process.env.PORT || 3001;
   app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);

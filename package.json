@@ -4,6 +4,7 @@
     "type": "module",
     "scripts": {
         "dev": "node server.js",
+        "start": "node server.js",
         "migrate": "node scripts/migrate.js",
         "build-css": "npx @tailwindcss/cli -i ./public/styles.css -o ./public/output.css --watch",
         "test": "NODE_ENV=test node --experimental-vm-modules node_modules/.bin/jest"
@@ -11,6 +12,7 @@
     "dependencies": {
         "@fortawesome/fontawesome-free": "^7.1.0",
         "bcrypt": "^5.1.1",
+        "cookie-session": "^2.0.0",
         "dotenv": "^17.2.3",
         "ejs": "^3.1.9",
         "express": "^4.18.2",
