@@ -15,7 +15,30 @@ router.get('/', async (req, res) => {
     
     // Provide more helpful error messages
     if (err.code === 'DATABASE_URL_MISSING' || err.message?.includes('DATABASE_URL')) {
-      res.status(500).send('Database configuration error. Please contact the administrator.');
+      res.status(500).send(`
+        <html>
+          <head><title>Configuration Error</title></head>
+          <body style="font-family: Arial, sans-serif; padding: 40px; text-align: center;">
+            <h1>Database Configuration Error</h1>
+            <p>The DATABASE_URL environment variable is not configured.</p>
+            <p>Please set it in your Vercel project settings.</p>
+            <hr>
+            <h2>How to Fix:</h2>
+            <ol style="text-align: left; max-width: 600px; margin: 0 auto;">
+              <li>Go to your Vercel project dashboard</li>
+              <li>Navigate to <strong>Settings → Environment Variables</strong></li>
+              <li>Add a new variable:
+                <ul>
+                  <li><strong>Name:</strong> DATABASE_URL</li>
+                  <li><strong>Value:</strong> Your PostgreSQL connection string</li>
+                </ul>
+              </li>
+              <li>Format: <code>postgresql://user:password@host:port/database</code></li>
+              <li>Redeploy your application</li>
+            </ol>
+          </body>
+        </html>
+      `);
     } else if (err.code === 'ENOTFOUND' || err.code === 'ECONNREFUSED' || err.code === 'ETIMEDOUT') {
       res.status(500).send('Database connection error. Please try again later.');
     } else {
