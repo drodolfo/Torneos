@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import { query } from '../db.js';
 import config from '../config.js';
 
