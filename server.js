@@ -12,9 +12,8 @@ if (!config.databaseUrl) {
   console.error('========================================');
   console.error('ERROR: DATABASE_URL is not set!');
   console.error('========================================');
-  console.error('Please set the DATABASE_URL environment variable in your Vercel project:');
-  console.error('1. Go to your Vercel project settings');
-  console.error('2. Navigate to Environment Variables');
+  console.error('Please set the DATABASE_URL environment variable in your deployment environment:');
+  console.error('1. Set DATABASE_URL in your environment variables');
   console.error('3. Add DATABASE_URL with your PostgreSQL connection string');
   console.error('   Format: postgresql://user:password@host:port/database');
   console.error('========================================');
