@@ -63,9 +63,9 @@ function getClient() {
       connect_timeout: 10,
     };
 
-    // SSL configuration
-    if (isSupabase) {
-      clientConfig.ssl = 'require'; // Supabase requires SSL
+    // SSL configuration - required in production for security
+    if (process.env.NODE_ENV === 'production') {
+      clientConfig.ssl = 'require';
     } else {
       clientConfig.ssl = 'prefer';
     }
