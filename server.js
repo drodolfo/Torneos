@@ -110,7 +110,7 @@ app.get('/test-db', async (req, res) => {
       }
     });
   } catch (err) {
-    res.status(500).json({
+    const response = {
       status: 'error',
       message: 'Database connection failed',
       error: {
@@ -124,7 +124,31 @@ app.get('/test-db', async (req, res) => {
         etimedout: 'If code is ETIMEDOUT: Connection timeout. Check network connectivity.',
         authentication: 'If authentication error: Check username and password in DATABASE_URL.'
       }
-    });
+    };
+    
+    // Special handling for DATABASE_URL_MISSING
+    if (err.code === 'DATABASE_URL_MISSING') {
+      response.message = 'DATABASE_URL environment variable is not set in Vercel';
+      response.fixSteps = {
+        step1: 'Go to your Vercel Dashboard: https://vercel.com/dashboard',
+        step2: 'Select your project',
+        step3: 'Navigate to Settings → Environment Variables',
+        step4: 'Click "Add New"',
+        step5: {
+          name: 'DATABASE_URL',
+          value: 'Your PostgreSQL connection string',
+          example: 'postgresql://postgres:password@db.xxxxx.supabase.co:5432/postgres',
+          note: 'Get this from Supabase Dashboard → Settings → Database → Connection string → URI tab'
+        },
+        step6: 'Select "Production" environment (and Preview/Development if needed)',
+        step7: 'Click "Save"',
+        step8: 'IMPORTANT: Redeploy your application (Deployments → ⋯ → Redeploy)',
+        step9: 'Wait for deployment to complete, then test again'
+      };
+      response.important = 'The .env file is only for local development. You MUST set DATABASE_URL in Vercel environment variables for production.';
+    }
+    
+    res.status(500).json(response);
   }
 });
 

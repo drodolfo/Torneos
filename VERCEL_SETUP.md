@@ -1,5 +1,12 @@
 # Vercel Setup Instructions
 
+## ⚠️ Important: .env file is for local development only
+
+**The `.env` file in your project is ONLY used for local development.**  
+**For Vercel production, you MUST set environment variables in the Vercel Dashboard.**
+
+If you see `DATABASE_URL_MISSING` error, it means the environment variable is not set in Vercel, even if you have it in your local `.env` file.
+
 ## Required Environment Variables
 
 You need to set the following environment variables in your Vercel project:
