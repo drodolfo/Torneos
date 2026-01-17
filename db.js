@@ -36,7 +36,7 @@ function resetClient() {
 function getClient() {
   if (!client) {
     if (!config.databaseUrl) {
-      const error = new Error('DATABASE_URL environment variable is not set. Please configure it in your Vercel project settings.');
+      const error = new Error('DATABASE_URL environment variable is not set. Please configure it in your deployment environment settings.');
       console.error(error.message);
       throw error;
     }
@@ -87,7 +87,7 @@ export async function query(text, params) {
   try {
     // Check if DATABASE_URL is set before attempting connection
     if (!config.databaseUrl) {
-      const error = new Error('DATABASE_URL is not configured. Please set it in your Vercel environment variables.');
+      const error = new Error('DATABASE_URL is not configured. Please set it in your environment variables.');
       error.code = 'DATABASE_URL_MISSING';
       throw error;
     }
@@ -128,7 +128,7 @@ export async function query(text, params) {
         console.error('3. If paused, click "Restore project"');
         console.error('4. Go to Settings → Database → Connection string');
         console.error('5. Copy the URI connection string');
-        console.error('6. Update DATABASE_URL in Vercel and redeploy');
+        console.error('6. Update DATABASE_URL in your deployment environment and redeploy');
       } else {
         console.error('Current DATABASE_URL format:', config.databaseUrl ? 'Set (but hostname not resolvable)' : 'Not set');
         console.error('Check that the hostname in your connection string is correct and accessible.');
@@ -136,13 +136,13 @@ export async function query(text, params) {
     } else if (err.code === 'ECONNREFUSED') {
       console.error('Connection refused. Check that the database server is running and accessible.');
       if (config.databaseUrl && config.databaseUrl.includes('.supabase.co')) {
-        console.error('Supabase: Check that your database allows connections from Vercel IPs');
+        console.error('Supabase: Check that your database allows connections from your deployment IPs');
       }
     } else if (err.code === 'ETIMEDOUT') {
       console.error('Connection timeout. Check network connectivity and firewall settings.');
     } else if (err.code === 'DATABASE_URL_MISSING') {
-      console.error('DATABASE_URL environment variable is not set in Vercel.');
-      console.error('To fix: Go to Vercel Dashboard → Project → Settings → Environment Variables');
+      console.error('DATABASE_URL environment variable is not set.');
+      console.error('To fix: Set DATABASE_URL in your environment variables');
       console.error('Add DATABASE_URL with your Supabase connection string');
     } else if (err.code === '28P01' || err.message?.includes('password authentication')) {
       console.error('Authentication failed. Check that your DATABASE_URL has the correct username and password.');

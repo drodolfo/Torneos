@@ -21,11 +21,11 @@ router.get('/', async (req, res) => {
           <body style="font-family: Arial, sans-serif; padding: 40px; text-align: center;">
             <h1>Database Configuration Error</h1>
             <p>The DATABASE_URL environment variable is not configured.</p>
-            <p>Please set it in your Vercel project settings.</p>
+            <p>Please set it in your deployment environment settings.</p>
             <hr>
             <h2>How to Fix:</h2>
             <ol style="text-align: left; max-width: 600px; margin: 0 auto;">
-              <li>Go to your Vercel project dashboard</li>
+              <li>Go to your deployment platform dashboard</li>
               <li>Navigate to <strong>Settings → Environment Variables</strong></li>
               <li>Add a new variable:
                 <ul>

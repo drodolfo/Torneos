@@ -201,12 +201,11 @@ app.use((err, req, res, next) => {
   res.status(500).send(errorMessage);
 });
 
-// Export for Vercel (serverless function)
+// Export for serverless deployment
 export default app;
 
 // Local development: start a listener
-// Vercel sets NODE_ENV to 'production', so this won't run in production
-if (!process.env.VERCEL && process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'test') {
+if (process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'test') {
   const port = process.env.PORT || 3001;
   app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
