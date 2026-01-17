@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 import config from './config.js';
 import adminRoutes from './routes/admin.js';
 import publicRoutes from './routes/public.js';
+import { query } from './db.js';
 
 // Validate required environment variables at startup
 if (!config.databaseUrl) {
@@ -78,14 +79,53 @@ app.get('/health', (req, res) => {
         port: url.port || '5432',
         database: url.pathname.replace('/', ''),
         isSupabase: url.hostname.includes('.supabase.co'),
-        protocol: url.protocol.replace(':', '')
+        protocol: url.protocol.replace(':', ''),
+        username: url.username || 'not set'
       };
+      
+      // Check if Supabase project might be paused
+      if (url.hostname.includes('.supabase.co')) {
+        health.database.note = 'If you see ENOTFOUND errors, your Supabase project might be paused. Check Supabase Dashboard.';
+      }
     } catch (err) {
       health.database = { error: 'Invalid connection string format' };
     }
   }
   
   res.status(200).json(health);
+});
+
+// Database connection test endpoint
+app.get('/test-db', async (req, res) => {
+  try {
+    // Simple query to test connection
+    const result = await query('SELECT NOW() as current_time, version() as pg_version');
+    res.status(200).json({
+      status: 'success',
+      message: 'Database connection successful',
+      timestamp: new Date().toISOString(),
+      database: {
+        time: result.rows[0].current_time,
+        version: result.rows[0].pg_version.substring(0, 50) + '...'
+      }
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: 'error',
+      message: 'Database connection failed',
+      error: {
+        code: err.code,
+        message: err.message,
+        hostname: err.hostname || 'unknown'
+      },
+      troubleshooting: {
+        enotfound: 'If code is ENOTFOUND: Your Supabase project might be paused. Go to Supabase Dashboard and restore it.',
+        econnrefused: 'If code is ECONNREFUSED: Database server is not accessible. Check firewall settings.',
+        etimedout: 'If code is ETIMEDOUT: Connection timeout. Check network connectivity.',
+        authentication: 'If authentication error: Check username and password in DATABASE_URL.'
+      }
+    });
+  }
 });
 
 // Routes

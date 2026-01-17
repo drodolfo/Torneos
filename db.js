@@ -113,14 +113,33 @@ export async function query(text, params) {
     
     // Handle specific error types
     if (err.code === 'ENOTFOUND') {
-      console.error('DNS resolution failed. Check that DATABASE_URL contains a valid hostname.');
-      console.error('Current DATABASE_URL format:', config.databaseUrl ? 'Set (but hostname not resolvable)' : 'Not set');
+      console.error('========================================');
+      console.error('DNS resolution failed (ENOTFOUND)');
+      console.error('The hostname in DATABASE_URL cannot be resolved.');
+      console.error('========================================');
+      
       if (config.databaseUrl && config.databaseUrl.includes('.supabase.co')) {
-        console.error('Supabase connection issue:');
-        console.error('1. Verify DATABASE_URL is set correctly in Vercel environment variables');
-        console.error('2. Get the connection string from Supabase Dashboard → Database → Connection string');
-        console.error('3. Make sure you redeployed after setting the environment variable');
-        console.error('4. Check that the connection string uses the correct format: postgresql://...');
+        console.error('Supabase ENOTFOUND - Common causes:');
+        console.error('1. Supabase project is PAUSED (free tier pauses after inactivity)');
+        console.error('   → Go to Supabase Dashboard and RESTORE/UNPAUSE your project');
+        console.error('2. Connection string is incorrect or outdated');
+        console.error('   → Get fresh connection string from Supabase Dashboard → Settings → Database → Connection string → URI');
+        console.error('3. Supabase project was deleted');
+        console.error('   → Check if project still exists in Supabase Dashboard');
+        console.error('4. Hostname changed (rare)');
+        console.error('   → Get the latest connection string from Supabase');
+        console.error('');
+        console.error('Current hostname:', err.hostname || 'unknown');
+        console.error('To fix:');
+        console.error('1. Go to https://app.supabase.com');
+        console.error('2. Select your project');
+        console.error('3. If paused, click "Restore project"');
+        console.error('4. Go to Settings → Database → Connection string');
+        console.error('5. Copy the URI connection string');
+        console.error('6. Update DATABASE_URL in Vercel and redeploy');
+      } else {
+        console.error('Current DATABASE_URL format:', config.databaseUrl ? 'Set (but hostname not resolvable)' : 'Not set');
+        console.error('Check that the hostname in your connection string is correct and accessible.');
       }
     } else if (err.code === 'ECONNREFUSED') {
       console.error('Connection refused. Check that the database server is running and accessible.');

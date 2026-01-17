@@ -67,6 +67,8 @@ Default admin credentials for bootstrapping the first admin user.
 2. **Verify it's working:**
    - Visit `https://your-app.vercel.app/health`
    - You should see: `{"status":"ok","timestamp":"...","databaseUrl":"configured"}`
+   - Visit `https://your-app.vercel.app/test-db` to test the actual database connection
+   - If you see ENOTFOUND error, your Supabase project is likely paused - restore it in Supabase Dashboard
 
 3. **Check the homepage:**
    - Visit `https://your-app.vercel.app/`
@@ -81,13 +83,24 @@ Default admin credentials for bootstrapping the first admin user.
 - Verify it's set for the **Production** environment (not just Preview/Development)
 - Check the `/health` endpoint - it should show `"databaseUrl":"configured"`
 
-### "ENOTFOUND" error (DNS resolution failed)
+### "ENOTFOUND" error (DNS resolution failed) ⚠️ MOST COMMON ISSUE
 - The database hostname cannot be resolved
-- **For Supabase:** Make sure you're using the correct connection string from Supabase Dashboard
-- Verify the connection string format: `postgresql://postgres:password@db.xxxxx.supabase.co:5432/postgres`
-- Check that you replaced `[YOUR-PASSWORD]` with your actual password
-- Make sure you're using the **URI** connection string, not the pooler string
-- **Solution:** Double-check the connection string in Supabase Dashboard → Settings → Database → Connection string → URI tab
+- **For Supabase - MOST LIKELY CAUSE: Project is PAUSED**
+  - **Free tier Supabase projects automatically pause after 7 days of inactivity**
+  - **Solution:** Go to [Supabase Dashboard](https://app.supabase.com) → Select your project → Click **"Restore project"** or **"Unpause"**
+  - After restoring, wait a few minutes for the database to be available
+  - Then test the connection again
+- **Other causes:**
+  - Connection string is incorrect or outdated
+    - Get fresh connection string from Supabase Dashboard → Settings → Database → Connection string → URI tab
+    - Make sure you replaced `[YOUR-PASSWORD]` with your actual password
+  - Supabase project was deleted
+    - Check if project still exists in Supabase Dashboard
+  - Hostname changed (rare)
+    - Get the latest connection string from Supabase
+- **Test your connection:**
+  - Visit `https://your-app.vercel.app/test-db` to test the database connection
+  - This will show detailed error information if connection fails
 
 ### "Connection refused" error
 - Your database might not allow external connections
