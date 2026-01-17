@@ -92,8 +92,9 @@ export async function query(text, params) {
       throw error;
     }
 
-    const clientInstance = getClient();
-    const res = await clientInstance.unsafe(text, params);
+    const poolInstance = getPool();
+    client = await poolInstance.connect();
+    const res = await client.query(text, params);
     return res;
   } catch (err) {
     console.error('Database query error:', err);
@@ -149,10 +150,14 @@ export async function query(text, params) {
       console.error('Database does not exist. Check that the database name in DATABASE_URL is correct.');
     }
     
-    // If connection error, reset client to allow reconnection
+    // If connection error, reset pool to allow reconnection
     if (err.code === 'ECONNREFUSED' || err.code === 'ETIMEDOUT' || err.code === 'ENOTFOUND' || err.message?.includes('connection')) {
-      resetClient();
+      resetPool();
     }
     throw err;
+  } finally {
+    if (client) {
+      client.release();
+    }
   }
 }

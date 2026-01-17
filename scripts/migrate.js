@@ -1,18 +1,22 @@
-import { execSync } from 'child_process';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import bcrypt from 'bcrypt';
 import { query } from '../db.js';
 import config from '../config.js';
 
-(async () => {
-  // Run Drizzle migrations
-  try {
-    execSync('npm run db:migrate', { stdio: 'inherit' });
-  } catch (error) {
-    console.error('Migration failed:', error);
-    process.exit(1);
-  }
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-  // Drizzle migration handles schema, but ensure any additional setup
+(async () => {
+  const sql = fs.readFileSync(path.join(__dirname, '../migrations/001_init.sql'), 'utf8');
+  await query(sql);
+
+  // Ensure visible column exists in tournaments
+  await query(`ALTER TABLE tournaments ADD COLUMN IF NOT EXISTS visible BOOLEAN DEFAULT FALSE`);
+
+  // Ensure rules column exists in tournaments
+  await query(`ALTER TABLE tournaments ADD COLUMN IF NOT EXISTS rules TEXT`);
 
   const { rows } = await query('SELECT * FROM admins WHERE username = $1', [config.adminBootstrapUser]);
   if (rows.length === 0) {
