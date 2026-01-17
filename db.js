@@ -1,4 +1,4 @@
-import postgres from 'postgres';
+import { Pool } from 'pg';
 import config from './config.js';
 
 // Note: DATABASE_URL must be set in environment variables for production
@@ -19,21 +19,21 @@ function normalizeConnectionString(connectionString) {
   return connectionString;
 }
 
-// Create a singleton client for serverless environments
-let client;
+// Create a singleton pool for serverless environments
+let pool;
 
-function resetClient() {
-  if (client) {
+function resetPool() {
+  if (pool) {
     try {
-      client.end();
+      pool.end();
     } catch (err) {
-      console.error('Error ending client:', err);
+      console.error('Error ending pool:', err);
     }
-    client = null;
+    pool = null;
   }
 }
 
-function getClient() {
+function getPool() {
   if (!client) {
     if (!config.databaseUrl) {
       const error = new Error('DATABASE_URL environment variable is not set. Please configure it in your deployment environment settings.');
@@ -56,31 +56,38 @@ function getClient() {
     console.log('Initializing database connection...');
     console.log('Database provider:', isSupabase ? 'Supabase' : 'Other');
 
-    // For Drizzle/postgres, use postgres client
-    const clientConfig = {
+    // Supabase requires SSL and specific connection settings
+    const poolConfig = {
+      connectionString: normalizedUrl,
+      // Serverless-friendly pool settings
       max: 1, // Limit connections for serverless
-      idle_timeout: 20,
-      connect_timeout: 10,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 10000,
     };
 
-    // SSL configuration - required in production for security
-    if (process.env.NODE_ENV === 'production') {
-      clientConfig.ssl = 'require';
+    // SSL configuration - required for Supabase and most cloud providers
+    if (isSupabase) {
+      // Supabase requires SSL with specific settings
+      poolConfig.ssl = {
+        rejectUnauthorized: false, // Supabase uses self-signed certificates
+        require: true
+      };
     } else {
-      clientConfig.ssl = 'prefer';
+      // Other providers might also need SSL
+      poolConfig.ssl = { rejectUnauthorized: false };
     }
 
-    client = postgres(normalizedUrl, clientConfig);
+    pool = new Pool(poolConfig);
 
-    // Handle client errors
-    client.on('error', (err) => {
-      console.error('Unexpected error on client', err);
+    // Handle pool errors
+    pool.on('error', (err) => {
+      console.error('Unexpected error on idle client', err);
       console.error('Error code:', err.code);
-      // Reset client on error to allow reconnection
-      resetClient();
+      // Reset pool on error to allow reconnection
+      resetPool();
     });
   }
-  return client;
+  return pool;
 }
 
 export async function query(text, params) {
