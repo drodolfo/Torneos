@@ -148,6 +148,34 @@ app.get('/test-db', async (req, res) => {
       response.important = 'The .env file is only for local development. You MUST set DATABASE_URL in Vercel environment variables for production.';
     }
     
+    // Special handling for ENOTFOUND (Supabase project paused)
+    if (err.code === 'ENOTFOUND' && config.databaseUrl && config.databaseUrl.includes('.supabase.co')) {
+      response.message = 'Supabase hostname cannot be resolved (ENOTFOUND)';
+      response.mostLikelyCause = 'Your Supabase project is PAUSED. Free tier projects pause after 7 days of inactivity.';
+      response.fixSteps = {
+        step1: 'Go to Supabase Dashboard: https://app.supabase.com',
+        step2: 'Select your project',
+        step3: 'Look for "Project Paused" message or "Restore" button',
+        step4: 'Click "Restore project" or "Unpause"',
+        step5: 'Wait 2-3 minutes for the database to be restored',
+        step6: 'Verify the connection string is still correct:',
+        substep6a: 'Go to Settings → Database → Connection string',
+        substep6b: 'Select "URI" tab (not Connection Pooling)',
+        substep6c: 'Copy the connection string',
+        step7: 'If connection string changed, update it in Vercel:',
+        substep7a: 'Vercel Dashboard → Your Project → Settings → Environment Variables',
+        substep7b: 'Edit DATABASE_URL with the new connection string',
+        substep7c: 'Save and redeploy',
+        step8: 'Test the connection again at /test-db'
+      };
+      response.alternativeCauses = {
+        cause1: 'Project was deleted - Check if project exists in Supabase Dashboard',
+        cause2: 'Connection string is incorrect - Get fresh connection string from Supabase',
+        cause3: 'Hostname changed - Rare, but get latest connection string from Supabase'
+      };
+      response.currentHostname = err.hostname || 'unknown';
+    }
+    
     res.status(500).json(response);
   }
 });
