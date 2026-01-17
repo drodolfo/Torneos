@@ -1,4 +1,4 @@
-import { Pool } from 'pg';
+import postgres from 'postgres';
 import config from './config.js';
 
 // Note: DATABASE_URL must be set in environment variables for production
@@ -19,28 +19,28 @@ function normalizeConnectionString(connectionString) {
   return connectionString;
 }
 
-// Create a singleton pool for serverless environments
-let pool;
+// Create a singleton client for serverless environments
+let client;
 
-function resetPool() {
-  if (pool) {
+function resetClient() {
+  if (client) {
     try {
-      pool.end();
+      client.end();
     } catch (err) {
-      console.error('Error ending pool:', err);
+      console.error('Error ending client:', err);
     }
-    pool = null;
+    client = null;
   }
 }
 
-function getPool() {
-  if (!pool) {
+function getClient() {
+  if (!client) {
     if (!config.databaseUrl) {
       const error = new Error('DATABASE_URL environment variable is not set. Please configure it in your Vercel project settings.');
       console.error(error.message);
       throw error;
     }
-    
+
     // Normalize and validate DATABASE_URL format
     const normalizedUrl = normalizeConnectionString(config.databaseUrl);
     if (!normalizedUrl) {
@@ -49,49 +49,41 @@ function getPool() {
       console.error('Current DATABASE_URL format is invalid');
       throw error;
     }
-    
+
     // Parse connection string to check if it's Supabase
     const isSupabase = config.databaseUrl.includes('.supabase.co');
-    
-    console.log('Initializing database connection pool...');
+
+    console.log('Initializing database connection...');
     console.log('Database provider:', isSupabase ? 'Supabase' : 'Other');
-    
-    // Supabase requires SSL and specific connection settings
-    const poolConfig = {
-      connectionString: normalizedUrl,
-      // Serverless-friendly pool settings
+
+    // For Drizzle/postgres, use postgres client
+    const clientConfig = {
       max: 1, // Limit connections for serverless
-      idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 10000,
+      idle_timeout: 20,
+      connect_timeout: 10,
     };
-    
-    // SSL configuration - required for Supabase and most cloud providers
+
+    // SSL configuration
     if (isSupabase) {
-      // Supabase requires SSL with specific settings
-      poolConfig.ssl = {
-        rejectUnauthorized: false, // Supabase uses self-signed certificates
-        require: true
-      };
+      clientConfig.ssl = 'require'; // Supabase requires SSL
     } else {
-      // Other providers might also need SSL
-      poolConfig.ssl = { rejectUnauthorized: false };
+      clientConfig.ssl = 'prefer';
     }
-    
-    pool = new Pool(poolConfig);
-    
-    // Handle pool errors
-    pool.on('error', (err) => {
-      console.error('Unexpected error on idle client', err);
+
+    client = postgres(normalizedUrl, clientConfig);
+
+    // Handle client errors
+    client.on('error', (err) => {
+      console.error('Unexpected error on client', err);
       console.error('Error code:', err.code);
-      // Reset pool on error to allow reconnection
-      resetPool();
+      // Reset client on error to allow reconnection
+      resetClient();
     });
   }
-  return pool;
+  return client;
 }
 
 export async function query(text, params) {
-  let client;
   try {
     // Check if DATABASE_URL is set before attempting connection
     if (!config.databaseUrl) {
@@ -99,10 +91,9 @@ export async function query(text, params) {
       error.code = 'DATABASE_URL_MISSING';
       throw error;
     }
-    
-    const poolInstance = getPool();
-    client = await poolInstance.connect();
-    const res = await client.query(text, params);
+
+    const clientInstance = getClient();
+    const res = await clientInstance.unsafe(text, params);
     return res;
   } catch (err) {
     console.error('Database query error:', err);
@@ -158,14 +149,10 @@ export async function query(text, params) {
       console.error('Database does not exist. Check that the database name in DATABASE_URL is correct.');
     }
     
-    // If connection error, reset pool to allow reconnection
+    // If connection error, reset client to allow reconnection
     if (err.code === 'ECONNREFUSED' || err.code === 'ETIMEDOUT' || err.code === 'ENOTFOUND' || err.message?.includes('connection')) {
-      resetPool();
+      resetClient();
     }
     throw err;
-  } finally {
-    if (client) {
-      client.release();
-    }
   }
 }
