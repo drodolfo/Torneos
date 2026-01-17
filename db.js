@@ -3,6 +3,22 @@ import config from './config.js';
 
 // Note: DATABASE_URL must be set in environment variables for production
 
+// Helper function to validate and normalize connection string
+function normalizeConnectionString(connectionString) {
+  if (!connectionString) {
+    return null;
+  }
+  
+  // If the connection string contains unencoded special characters in password,
+  // we should handle it, but typically Supabase provides properly encoded strings
+  // Just validate the format
+  if (!connectionString.startsWith('postgresql://') && !connectionString.startsWith('postgres://')) {
+    return null;
+  }
+  
+  return connectionString;
+}
+
 // Create a singleton pool for serverless environments
 let pool;
 
@@ -25,26 +41,48 @@ function getPool() {
       throw error;
     }
     
-    // Validate DATABASE_URL format
-    if (!config.databaseUrl.startsWith('postgresql://') && !config.databaseUrl.startsWith('postgres://')) {
+    // Normalize and validate DATABASE_URL format
+    const normalizedUrl = normalizeConnectionString(config.databaseUrl);
+    if (!normalizedUrl) {
       const error = new Error('DATABASE_URL must be a valid PostgreSQL connection string starting with postgresql:// or postgres://');
       console.error(error.message);
+      console.error('Current DATABASE_URL format is invalid');
       throw error;
     }
     
+    // Parse connection string to check if it's Supabase
+    const isSupabase = config.databaseUrl.includes('.supabase.co');
+    
     console.log('Initializing database connection pool...');
-    pool = new Pool({
-      connectionString: config.databaseUrl,
-      ssl: { rejectUnauthorized: false }, // needed for many hosted Postgres providers
+    console.log('Database provider:', isSupabase ? 'Supabase' : 'Other');
+    
+    // Supabase requires SSL and specific connection settings
+    const poolConfig = {
+      connectionString: normalizedUrl,
       // Serverless-friendly pool settings
       max: 1, // Limit connections for serverless
       idleTimeoutMillis: 30000,
       connectionTimeoutMillis: 10000,
-    });
+    };
+    
+    // SSL configuration - required for Supabase and most cloud providers
+    if (isSupabase) {
+      // Supabase requires SSL with specific settings
+      poolConfig.ssl = {
+        rejectUnauthorized: false, // Supabase uses self-signed certificates
+        require: true
+      };
+    } else {
+      // Other providers might also need SSL
+      poolConfig.ssl = { rejectUnauthorized: false };
+    }
+    
+    pool = new Pool(poolConfig);
     
     // Handle pool errors
     pool.on('error', (err) => {
       console.error('Unexpected error on idle client', err);
+      console.error('Error code:', err.code);
       // Reset pool on error to allow reconnection
       resetPool();
     });
@@ -77,12 +115,28 @@ export async function query(text, params) {
     if (err.code === 'ENOTFOUND') {
       console.error('DNS resolution failed. Check that DATABASE_URL contains a valid hostname.');
       console.error('Current DATABASE_URL format:', config.databaseUrl ? 'Set (but hostname not resolvable)' : 'Not set');
+      if (config.databaseUrl && config.databaseUrl.includes('.supabase.co')) {
+        console.error('Supabase connection issue:');
+        console.error('1. Verify DATABASE_URL is set correctly in Vercel environment variables');
+        console.error('2. Get the connection string from Supabase Dashboard → Database → Connection string');
+        console.error('3. Make sure you redeployed after setting the environment variable');
+        console.error('4. Check that the connection string uses the correct format: postgresql://...');
+      }
     } else if (err.code === 'ECONNREFUSED') {
       console.error('Connection refused. Check that the database server is running and accessible.');
+      if (config.databaseUrl && config.databaseUrl.includes('.supabase.co')) {
+        console.error('Supabase: Check that your database allows connections from Vercel IPs');
+      }
     } else if (err.code === 'ETIMEDOUT') {
       console.error('Connection timeout. Check network connectivity and firewall settings.');
     } else if (err.code === 'DATABASE_URL_MISSING') {
       console.error('DATABASE_URL environment variable is not set in Vercel.');
+      console.error('To fix: Go to Vercel Dashboard → Project → Settings → Environment Variables');
+      console.error('Add DATABASE_URL with your Supabase connection string');
+    } else if (err.code === '28P01' || err.message?.includes('password authentication')) {
+      console.error('Authentication failed. Check that your DATABASE_URL has the correct username and password.');
+    } else if (err.code === '3D000' || err.message?.includes('database')) {
+      console.error('Database does not exist. Check that the database name in DATABASE_URL is correct.');
     }
     
     // If connection error, reset pool to allow reconnection

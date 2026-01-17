@@ -61,11 +61,31 @@ app.locals.formatDateAR = (dateStr) => {
 
 // Health check endpoint (doesn't require database)
 app.get('/health', (req, res) => {
-  res.status(200).json({ 
-    status: 'ok', 
+  const health = {
+    status: 'ok',
     timestamp: new Date().toISOString(),
-    databaseUrl: config.databaseUrl ? 'configured' : 'not configured'
-  });
+    databaseUrl: config.databaseUrl ? 'configured' : 'not configured',
+    environment: process.env.NODE_ENV || 'not set',
+    vercel: !!process.env.VERCEL
+  };
+  
+  // Add database info if configured (without exposing sensitive data)
+  if (config.databaseUrl) {
+    try {
+      const url = new URL(config.databaseUrl);
+      health.database = {
+        host: url.hostname,
+        port: url.port || '5432',
+        database: url.pathname.replace('/', ''),
+        isSupabase: url.hostname.includes('.supabase.co'),
+        protocol: url.protocol.replace(':', '')
+      };
+    } catch (err) {
+      health.database = { error: 'Invalid connection string format' };
+    }
+  }
+  
+  res.status(200).json(health);
 });
 
 // Routes
