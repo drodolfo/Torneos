@@ -39,10 +39,79 @@ router.get('/', async (req, res) => {
           </body>
         </html>
       `);
-    } else if (err.code === 'ENOTFOUND' || err.code === 'ECONNREFUSED' || err.code === 'ETIMEDOUT') {
-      res.status(500).send('Database connection error. Please try again later.');
+    } else if (err.code === 'ENOTFOUND') {
+      // Check if it's a Supabase connection
+      const isSupabase = err.message?.includes('.supabase.co') || err.hostname?.includes('.supabase.co');
+      if (isSupabase) {
+        res.status(503).send(`
+          <html>
+            <head>
+              <title>Database Temporarily Unavailable</title>
+              <meta name="viewport" content="width=device-width, initial-scale=1">
+            </head>
+            <body style="font-family: Arial, sans-serif; padding: 40px; text-align: center; background: #f5f5f5;">
+              <div style="max-width: 600px; margin: 0 auto; background: white; padding: 40px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <h1 style="color: #333;">⚠️ Database Temporarily Unavailable</h1>
+                <p style="color: #666; font-size: 16px; line-height: 1.6;">
+                  The database connection cannot be established. This usually happens when the Supabase project is paused.
+                </p>
+                <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 4px; padding: 20px; margin: 20px 0; text-align: left;">
+                  <h3 style="margin-top: 0; color: #856404;">Most Common Cause: Supabase Project is Paused</h3>
+                  <p style="color: #856404; margin-bottom: 0;">
+                    Free tier Supabase projects automatically pause after 7 days of inactivity. 
+                    The project needs to be restored in the Supabase Dashboard.
+                  </p>
+                </div>
+                <hr style="margin: 30px 0;">
+                <h2 style="color: #333;">For Administrators:</h2>
+                <ol style="text-align: left; color: #666; line-height: 1.8;">
+                  <li>Go to <a href="https://app.supabase.com" target="_blank">Supabase Dashboard</a></li>
+                  <li>Select your project</li>
+                  <li>If you see "Project Paused", click <strong>"Restore project"</strong></li>
+                  <li>Wait 2-3 minutes for the database to be restored</li>
+                  <li>Refresh this page</li>
+                </ol>
+                <p style="color: #999; font-size: 14px; margin-top: 30px;">
+                  Error: ENOTFOUND - Hostname cannot be resolved<br>
+                  Hostname: ${err.hostname || 'unknown'}
+                </p>
+              </div>
+            </body>
+          </html>
+        `);
+      } else {
+        res.status(503).send(`
+          <html>
+            <head><title>Database Unavailable</title></head>
+            <body style="font-family: Arial, sans-serif; padding: 40px; text-align: center;">
+              <h1>Database Connection Error</h1>
+              <p>The database server cannot be reached. Please try again later.</p>
+              <p style="color: #999; font-size: 14px;">Error: ${err.message}</p>
+            </body>
+          </html>
+        `);
+      }
+    } else if (err.code === 'ECONNREFUSED' || err.code === 'ETIMEDOUT') {
+      res.status(503).send(`
+        <html>
+          <head><title>Database Unavailable</title></head>
+          <body style="font-family: Arial, sans-serif; padding: 40px; text-align: center;">
+            <h1>Database Temporarily Unavailable</h1>
+            <p>The database connection could not be established. Please try again later.</p>
+            <p style="color: #999; font-size: 14px;">Error: ${err.code}</p>
+          </body>
+        </html>
+      `);
     } else {
-      res.status(500).send('Internal Server Error');
+      res.status(500).send(`
+        <html>
+          <head><title>Server Error</title></head>
+          <body style="font-family: Arial, sans-serif; padding: 40px; text-align: center;">
+            <h1>Internal Server Error</h1>
+            <p>An unexpected error occurred. Please try again later.</p>
+          </body>
+        </html>
+      `);
     }
   }
 });
